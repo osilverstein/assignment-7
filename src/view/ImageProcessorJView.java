@@ -154,7 +154,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
     JPanel filterPanel = new JPanel();
     filterPanel.setBorder(BorderFactory.createTitledBorder("Filter"));
 
-    String[] filtersToChoose = {"Sharpen", "Blur"};
+    String[] filtersToChoose = {"Sharpen", "Blur", "Mosaic"};
 
     filterDropdown = new JComboBox<>(filtersToChoose);
     filterDropdown.setBounds(80, 50, 140, 20);

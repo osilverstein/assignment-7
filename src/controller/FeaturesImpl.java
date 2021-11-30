@@ -16,6 +16,7 @@ import model.component.SepiaComponent;
 import model.component.ValueComponent;
 import model.filter.Filter;
 import model.filter.GaussianBlur;
+import model.filter.MosaicBlur;
 import model.filter.Sharpen;
 import model.flip.Flip;
 import model.flip.HorizontalFlip;
@@ -77,6 +78,7 @@ public class FeaturesImpl implements IMEFeatures {
     Map<String, Filter> filters = new HashMap<String, Filter>();
     filters.put("blur", new GaussianBlur());
     filters.put("sharpen", new Sharpen());
+    filters.put("mosaic", new MosaicBlur());
 
     ImprovedImageProcessorModel copy = this.getCopy("Must load before applying filter");
     copy.filter(filters.get(type.toLowerCase()));

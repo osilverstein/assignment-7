@@ -15,6 +15,7 @@ import controller.commands.GreenComponentCommand;
 import controller.commands.HorizontalFlipCommand;
 import controller.commands.IntensityComponentCommand;
 import controller.commands.LumaComponentCommand;
+import controller.commands.MosaicCommand;
 import controller.commands.RedComponentCommand;
 import controller.commands.SaveCommand;
 import controller.commands.SepiaComponentCommand;
@@ -60,104 +61,112 @@ public class UpdatedController implements ImageProcessorController {
     knownCommands = new HashMap<>();
     knownCommands.put("red-component",
         s -> {
-            try {
-              return new RedComponentCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new RedComponentCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("green-component",
         s -> {
-            try {
-              return new GreenComponentCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new GreenComponentCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("blue-component",
         s -> {
-            try {
-              return new BlueComponentCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new BlueComponentCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("luma-component",
         s -> {
-            try {
-              return new LumaComponentCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new LumaComponentCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("intensity-component",
         s -> {
-            try {
-              return new IntensityComponentCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new IntensityComponentCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("sepia-component",
         s -> {
-            try {
-              return new SepiaComponentCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new SepiaComponentCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("value-component",
         s -> {
-            try {
-              return new ValueComponentCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new ValueComponentCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("gaussian-blur",
         s -> {
-            try {
-              return new BlurCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new BlurCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("sharpen",
         s -> {
-            try {
-              return new SharpenCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new SharpenCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
+        });
+    knownCommands.put("mosaic",
+        s -> {
+          try {
+            return new MosaicCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("horizontal-flip",
         s -> {
-            try {
-              return new HorizontalFlipCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new HorizontalFlipCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("vertical-flip",
         s -> {
-            try {
-              return new VerticalFlipCommand(s.next(), s.next(), this.map);
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new VerticalFlipCommand(s.next(), s.next(), this.map);
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("brighten",
         s -> {
-            try {
-              return new BrightenCommand(s.nextInt(), s.next(), s.next(), this.map);
-            } catch (InputMismatchException e) {
-              s.next();
-              s.next();
-              s.next();
-              throw new IllegalStateException("Brighten requires an integer, please try again");
-            } catch (NoSuchElementException e) {
-              throw new IllegalStateException("Ran out of inputs.");
-            }
+          try {
+            return new BrightenCommand(s.nextInt(), s.next(), s.next(), this.map);
+          } catch (InputMismatchException e) {
+            s.next();
+            s.next();
+            s.next();
+            throw new IllegalStateException("Brighten requires an integer, please try again");
+          } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Ran out of inputs.");
+          }
         });
     knownCommands.put("save",
         s -> new SaveCommand(s.next(), s.next(), this.map));
@@ -229,10 +238,12 @@ public class UpdatedController implements ImageProcessorController {
   }
 
   /**
-   * Transmits a given message to the appendable while catching IOExceptions and transmitting them
+   * Transmits a given message to the appendable while catching IOExceptions and
+   * transmitting them
    * to the user as IllegalStateExceptions.
    *
-   * @param string represents the string that will be transmitted to the appendable.
+   * @param string represents the string that will be transmitted to the
+   *               appendable.
    */
   private void transmitMessage(String string) throws IllegalStateException {
     view.sendOutPutMessage(string);

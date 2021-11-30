@@ -1,0 +1,16 @@
+load SourceKoala.png koala
+red-component koala koala-red
+green-component koala koala-green
+blue-component koala koala-blue
+luma-component koala koala-luma
+intensity-component koala koala-intensity
+value-component koala koala-value
+sepia-component koala koala-sepia
+gaussian-blur koala koala-blur
+sharpen koala koala-sharpen
+vertical-flip koala koala-vertical
+horizontal-flip koala koala-horizontal
+brighten 50 koala koala-brighter
+brighten -50 koala koala-darker
+save KoalaNew.png koala-vertical
+q

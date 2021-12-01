@@ -28,9 +28,6 @@ public class MosaicBlur implements Filter {
   Matrix kernel;
   int numNodes;
   int[][] clusterMap;
-  //map of pixel coordinates to nearest cluster node 
-  HashMap<int[], int[]> pixelToNodeMap;
-  //arraylist of cluster node coordinates
   ArrayList<int[]> nodeCoords;
 
   /**

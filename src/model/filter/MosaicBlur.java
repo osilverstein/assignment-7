@@ -26,6 +26,7 @@ public class MosaicBlur implements Filter {
   int height;
   Matrix kernel;
   int numNodes;
+  int[][] clusterMap;
 
   /**
    * Constructor for an mosaic geometric filter.
@@ -48,10 +49,14 @@ public class MosaicBlur implements Filter {
    * 
    * @param pixels the pixels denoted.
    * @param seed   the seed to use for random.
-   * @return a map of pixel index to a predictable randomized boolean on whether
+   * @return a map of pixel index to a predictable randomized bit on whether
    *         they are a cluster node.
    */
   private int[][] generateClusterMap(Pixel[][] pixels, int seed) {
+    //check if clusterMap has been initialized
+    if (this.clusterMap != null) {
+      return this.clusterMap;
+    }
     Random rand = new Random(seed);
     int iterationsWithoutNode = 0;
     int averageInterationsWithoutNode = (int) ((pixels.length * pixels[0].length) / (numNodes * 1.2)); //1.2 is a magic number; see below
@@ -69,6 +74,7 @@ public class MosaicBlur implements Filter {
         }
       }
     }
+    this.clusterMap = clusterMap;
     return clusterMap;
 
   }

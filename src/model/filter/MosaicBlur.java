@@ -1,6 +1,7 @@
 
 package model.filter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -27,6 +28,10 @@ public class MosaicBlur implements Filter {
   Matrix kernel;
   int numNodes;
   int[][] clusterMap;
+  //map of pixel coordinates to nearest cluster node 
+  HashMap<int[], int[]> pixelToNodeMap;
+  //arraylist of cluster node coordinates
+  ArrayList<int[]> nodeCoords;
 
   /**
    * Constructor for an mosaic geometric filter.
@@ -41,6 +46,7 @@ public class MosaicBlur implements Filter {
     this.height = 3;
     this.kernel = new Matrix(width, height);
     this.numNodes = numNodes;
+    this.nodeCoords = new ArrayList<int[]>();
   }
 
   /**
@@ -67,7 +73,8 @@ public class MosaicBlur implements Filter {
         double probabilityOfNode = iterationsWithoutNode / averageInterationsWithoutNode;
         if (rand.nextDouble() + 0.9 < probabilityOfNode) { //TODO: 0.9 magic number to fix logic error; see below
           clusterMap[i][j] = 1;
-          iterationsWithoutNode = 0; //here: this maybe shoudn't be set to 0, just decremented
+          iterationsWithoutNode = 0;
+          nodeCoords.add(new int[] {i, j});
         } else {
           clusterMap[i][j] = 0;
           iterationsWithoutNode++;
@@ -76,7 +83,6 @@ public class MosaicBlur implements Filter {
     }
     this.clusterMap = clusterMap;
     return clusterMap;
-
   }
 
   /**
@@ -88,30 +94,25 @@ public class MosaicBlur implements Filter {
    * @param y          the y coordinate of the pixel.
    * @return the closest cluster node to a pixel as an int[].
    */
-  private int[] findClosestClusterNode(Pixel[][] pixels, int[][] clusterMap,
-      int x, int y) {
-    int[] closest = new int[2];
-    int min = Integer.MAX_VALUE;
-    
-    for (int i = 0; i < pixels.length; i++) {
-      for (int j = 0; j < pixels[0].length; j++) {
-        if (clusterMap[i][j] == 1) {
-          int distance = Math.abs(x - i) + Math.abs(y - j);
-          if (distance < min) {
-            min = distance;
-            closest[0] = i;
-            closest[1] = j;
-          }
-        }
+  private int[] findClosestNode(Pixel[][] pixels, int[][] clusterMap, int x, int y) {
+    int[] closestNode = new int[2];
+    int minDistance = Integer.MAX_VALUE;
+    for (int i = 0; i < nodeCoords.size(); i++) {
+      int[] nodeCoord = nodeCoords.get(i);
+      int distance = (int) Math.sqrt(Math.pow(nodeCoord[0] - x, 2) + Math.pow(nodeCoord[1] - y, 2));
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestNode = nodeCoord;
       }
     }
-    return closest;
+    return closestNode;
   }
 
   @Override
   public Pixel evaluateFilter(Pixel[][] pixels, int row, int col) {
-    int[] closestClusterNode = findClosestClusterNode(pixels, generateClusterMap(pixels, 420),
+    int[] closestClusterNode = findClosestNode(pixels, generateClusterMap(pixels, 420),
         row, col);
+    //returns pixel at a coordinate
     return pixels[closestClusterNode[0]][closestClusterNode[1]];
   }
 

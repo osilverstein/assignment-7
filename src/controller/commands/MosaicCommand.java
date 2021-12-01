@@ -10,6 +10,7 @@ import utilities.ImageRunTimeStorage;
  * enables the user to mosaicafy the image using a 5 by 5 kernel.
  */
 public class MosaicCommand extends AbstractCommand {
+  private int amount;
   /**
    * Constructor to be supered by an extensions of this abstract class
    * AbstractCommand.
@@ -20,13 +21,14 @@ public class MosaicCommand extends AbstractCommand {
    *                    names
    * @throws IllegalArgumentException if the {@code map} is null
    */
-  public MosaicCommand(String firstInput, String secondInput,
+  public MosaicCommand(int amount, String firstInput, String secondInput,
                        ImageRunTimeStorage map) {
     super(firstInput, secondInput, map);
 }
+
 @Override
 public String use(ImprovedImageProcessorModel m) {
-  m.filter(new MosaicBlur());
+  m.filter(new MosaicBlur(amount));
   return this.firstInput + " mosaicafied. Now called: " + this.secondInput;
 }
 

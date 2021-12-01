@@ -25,7 +25,8 @@ import utilities.ImageRunTimeStorage;
 import utilities.ImageUtil;
 
 /**
- * An implementation of our features interface to assist communication between the GUI view and
+ * An implementation of our features interface to assist communication between
+ * the GUI view and
  * the GUI controller. It features methods for each action:
  * runComponent, runFilter, runFlip, runBrighten, undo, save, and load.
  */
@@ -34,7 +35,9 @@ public class FeaturesImpl implements IMEFeatures {
   ArrayList<String> storedImages;
 
   /**
-   * Constructor that sets the storage from the controller, it is necessary for all actions.
+   * Constructor that sets the storage from the controller, it is necessary for
+   * all actions.
+   * 
    * @param storage is the runtime storage itself.
    */
   public FeaturesImpl(ImageRunTimeStorage storage) {
@@ -44,8 +47,7 @@ public class FeaturesImpl implements IMEFeatures {
 
   private ImprovedImageProcessorModel getCopy(String errorMessage) {
     try {
-      ImprovedImageProcessorModel original =
-              storage.grabFromRunTimeStorage(storage.getCurrentModel());
+      ImprovedImageProcessorModel original = storage.grabFromRunTimeStorage(storage.getCurrentModel());
       return original.getCopy();
     } catch (NullPointerException e) {
       throw new IllegalStateException(errorMessage);
@@ -78,11 +80,20 @@ public class FeaturesImpl implements IMEFeatures {
     Map<String, Filter> filters = new HashMap<String, Filter>();
     filters.put("blur", new GaussianBlur());
     filters.put("sharpen", new Sharpen());
-    filters.put("mosaic", new MosaicBlur());
+    filters.put("mosaic", new MosaicBlur(3));
 
     ImprovedImageProcessorModel copy = this.getCopy("Must load before applying filter");
-    copy.filter(filters.get(type.toLowerCase()));
-    this.addToStorage("-" + type, copy);
+    if (!type.contains("Mosaic")) {
+      copy.filter(filters.get(type.toLowerCase()));
+      this.addToStorage("-" + type, copy);
+    } else { //if mosaic
+      //type is the type + " " + the size of the mosaic tiles
+      String[] split = type.split(" ");
+      int size = Integer.parseInt(split[1]);
+      filters.put("mosaic", new MosaicBlur(size));
+      copy.filter(filters.get(split[0].toLowerCase()));
+      this.addToStorage("-" + split[0], copy);
+    }
   }
 
   @Override
@@ -110,8 +121,7 @@ public class FeaturesImpl implements IMEFeatures {
       this.storage.removeImage(current);
       this.storedImages.remove(this.storedImages.size() - 1);
       this.storage.setCurrentName(this.storedImages.get(this.storedImages.size() - 1));
-    }
-    else {
+    } else {
       throw new IllegalStateException("Cannot undo!");
     }
   }

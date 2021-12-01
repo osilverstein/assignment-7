@@ -129,4 +129,10 @@ public class MockView extends JFrame implements ImageProcessorViewGUI {
     this.log.append("calling refresh and drawing new histogram!\n");
     this.doPlot();
   }
+
+  @Override
+  public String getTextFieldValue(String whichOne) {
+    this.log.append("calling getTextFieldValue with " + whichOne + "\n");
+    return "";
+  }
 }

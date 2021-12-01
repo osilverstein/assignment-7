@@ -131,14 +131,6 @@ public class UpdatedController implements ImageProcessorController {
             throw new IllegalStateException("Ran out of inputs.");
           }
         });
-    knownCommands.put("mosaic",
-        s -> {
-          try {
-            return new MosaicCommand(s.next(), s.next(), this.map);
-          } catch (NoSuchElementException e) {
-            throw new IllegalStateException("Ran out of inputs.");
-          }
-        });
     knownCommands.put("horizontal-flip",
         s -> {
           try {
@@ -168,6 +160,19 @@ public class UpdatedController implements ImageProcessorController {
             throw new IllegalStateException("Ran out of inputs.");
           }
         });
+    knownCommands.put("mosaic",
+    s -> {
+      try {
+        return new MosaicCommand(s.nextInt(), s.next(), s.next(), this.map);
+      } catch (InputMismatchException e) {
+        s.next();
+        s.next();
+        s.next();
+        throw new IllegalStateException("Mosaic requires an integer, please try again");
+      } catch (NoSuchElementException e) {
+        throw new IllegalStateException("Ran out of inputs.");
+      }
+    });
     knownCommands.put("save",
         s -> new SaveCommand(s.next(), s.next(), this.map));
 
@@ -205,6 +210,7 @@ public class UpdatedController implements ImageProcessorController {
         try {
           c = cmd.apply(scan);
           String output = c.use(c.getModelCopy());
+
           this.transmitMessage(output);
         } catch (IllegalStateException e) {
           this.transmitMessage(e.getMessage());

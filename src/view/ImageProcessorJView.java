@@ -1,7 +1,7 @@
 package view;
 
-
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.BorderLayout;
@@ -12,6 +12,7 @@ import java.io.File;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
@@ -55,6 +56,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
 
   private JComboBox<String> filterDropdown;
   private JComboBox<String> componentDropdown;
+  private JTextField mosaicInput;
 
   /**
    * Constructor that creates the view structure with its panels, buttons, etc.
@@ -95,9 +97,9 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
     plotPanel.setPreferredSize(new Dimension((int) (width * 0.8), (int) (height * 0.25)));
 
     JLabel key = new JLabel("<html>Line Plot Key: <font color='#ff0000'>Red Component </font>" +
-            "<font color='#00ff00'>Green Component </font> " +
-            "<font color='#0000ff'>Blue Component </font> " +
-            "<font color='#000000'>Intensity Component</font> </html>");
+        "<font color='#00ff00'>Green Component </font> " +
+        "<font color='#0000ff'>Blue Component </font> " +
+        "<font color='#000000'>Intensity Component</font> </html>");
 
     plotContainer.add(key, BorderLayout.PAGE_START);
     plotContainer.add(plotPanel, BorderLayout.CENTER);
@@ -136,7 +138,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
     JPanel componentPanel = new JPanel();
     componentPanel.setBorder(BorderFactory.createTitledBorder("Apply Component"));
 
-    String[] componentsToChoose = {"Red", "Green", "Blue", "Value", "Intensity", "Luma", "Sepia"};
+    String[] componentsToChoose = { "Red", "Green", "Blue", "Value", "Intensity", "Luma", "Sepia" };
 
     componentDropdown = new JComboBox<>(componentsToChoose);
     componentDropdown.setBounds(80, 50, 120, 20);
@@ -154,11 +156,41 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
     JPanel filterPanel = new JPanel();
     filterPanel.setBorder(BorderFactory.createTitledBorder("Filter"));
 
-    String[] filtersToChoose = {"Sharpen", "Blur", "Mosaic"};
+    String[] filtersToChoose = { "Sharpen", "Blur", "Mosaic" };
+
+    // use a JComboBox to select the filter but for mosaic:
+    // we need to add a number field box to select the number of tiles
 
     filterDropdown = new JComboBox<>(filtersToChoose);
     filterDropdown.setBounds(80, 50, 140, 20);
     filterPanel.add(filterDropdown);
+
+    // number input field for the number of tiles
+    JPanel mosaicPanel = new JPanel();
+    mosaicPanel.setVisible(false);
+    filterDropdown.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (filterDropdown.getSelectedItem().equals("Mosaic")) {
+          mosaicPanel.setVisible(true);
+          //increase the size of the panel
+          filterPanel.setPreferredSize(new Dimension(filterPanel.getWidth(), filterPanel.getHeight() + 50));
+        } else {
+          mosaicPanel.setVisible(false);
+          //decrease the size of the panel
+          filterPanel.setPreferredSize(new Dimension(filterPanel.getWidth(), filterPanel.getHeight() - 100));
+        }
+
+      }
+    });
+
+    mosaicPanel.setBorder(BorderFactory.createTitledBorder("Mosaic"));
+    JLabel mosaicLabel = new JLabel("Number of Tiles");
+    mosaicPanel.add(mosaicLabel);
+    mosaicInput = new JTextField(5);
+    mosaicPanel.add(mosaicInput);
+    filterPanel.add(mosaicPanel);
+    // only show if mosaic is selected
 
     applyFilter = new JButton("Apply");
     applyFilter.setActionCommand("Apply Filter");
@@ -223,7 +255,6 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
 
     buttonPanel.add(outputPanel);
 
-
     this.pack();
     this.setVisible(true);
   }
@@ -233,8 +264,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
   }
 
   private void doPlot() {
-    ImprovedImageProcessorModel m =
-            this.storage.grabFromRunTimeStorage(this.storage.getCurrentModel());
+    ImprovedImageProcessorModel m = this.storage.grabFromRunTimeStorage(this.storage.getCurrentModel());
     Pixel[][] pixels = new Pixel[m.getHeight()][m.getWidth()];
     for (int row = 0; row < m.getHeight(); row++) {
       for (int col = 0; col < m.getWidth(); col++) {
@@ -246,6 +276,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
 
   /**
    * Retrieves the selected value for the brighten scroll bar.
+   * 
    * @return the integer value selected.
    */
   public int retrieveBrightenScrollInput() {
@@ -256,12 +287,13 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
 
   /**
    * Imports an image with a file chooser.
+   * 
    * @return the path of the file.
    */
   public String importImage() {
     final JFileChooser fchooser = new JFileChooser(".");
     FileNameExtensionFilter filter = new FileNameExtensionFilter(
-            "JPG, JPEG, PNG, PPM, or BPM Images", "jpg", "ppm", "jpeg", "png", "bpm");
+        "JPG, JPEG, PNG, PPM, or BPM Images", "jpg", "ppm", "jpeg", "png", "bpm");
     fchooser.setFileFilter(filter);
     int value = fchooser.showOpenDialog(ImageProcessorJView.this);
     if (value == JFileChooser.APPROVE_OPTION) {
@@ -273,6 +305,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
 
   /**
    * Exports the image with a file chooser.
+   * 
    * @return the path of the file.
    */
   public String exportImage() {
@@ -288,6 +321,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
 
   /**
    * Retrieves the value of the dropdown respective to the given dropdown.
+   * 
    * @param whichOne specifies which dropdown is being requested
    * @return the value of which Component or Filter is currently selected
    */
@@ -295,13 +329,22 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
     if (whichOne.equals("Component")) {
       return componentDropdown.getItemAt(componentDropdown.getSelectedIndex());
     } else if (whichOne.equals("Filter")) {
-      return filterDropdown.getItemAt(filterDropdown.getSelectedIndex());
+      // if the filter dropdown is selected as mosaic, check the mosaic dropdown
+      if (filterDropdown.getItemAt(filterDropdown.getSelectedIndex()).equals("Mosaic")) {
+        String out = filterDropdown.getItemAt(filterDropdown.getSelectedIndex());
+        //add the value from the mosaicInput to the output
+        out += " " + mosaicInput.getText();
+        return out;
+      } else {
+        return filterDropdown.getItemAt(filterDropdown.getSelectedIndex());
+      }
     }
     return null;
   }
 
   /**
    * Sets the action listeners for all the buttons.
+   * 
    * @param actionEvent is the actionEvent from the controller
    */
   public void setCommandButtonListener(ActionListener actionEvent) {
@@ -317,11 +360,11 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
 
   /**
    * Set the image to the model with the given path.
+   * 
    * @param absolutePath the path of the model in storage
    */
   public void updateView(String absolutePath) {
-    ImprovedImageProcessorModel m =
-            this.storage.grabFromRunTimeStorage(absolutePath);
+    ImprovedImageProcessorModel m = this.storage.grabFromRunTimeStorage(absolutePath);
     BufferedImage bI = null;
     try {
       bI = ImageUtil.convertToBuffered(m);
@@ -336,5 +379,13 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
   public void refresh() {
     this.repaint();
     this.doPlot();
+  }
+
+  @Override
+  public String getTextFieldValue(String whichOne) {
+    if (whichOne.equals("Mosaic") || whichOne.equals("mosaic")) {
+      return mosaicInput.getText();
+    }
+    return null;
   }
 }

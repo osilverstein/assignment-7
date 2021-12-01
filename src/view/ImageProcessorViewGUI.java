@@ -15,6 +15,8 @@ public interface ImageProcessorViewGUI extends ImageProcessorView {
 
   String getDropdownValue(String whichOne);
 
+  String getTextFieldValue(String whichOne);
+
   void setCommandButtonListener(ActionListener actionEvent);
 
   void updateView(String absolutePath);

@@ -70,6 +70,9 @@ public class GUIController implements IGUIController {
           break;
         case ("Apply Filter"):
           String filt = view.getDropdownValue("Filter");
+          String param = "";
+
+          
           features.runFilter(filt);
           view.updateView(this.storage.getCurrentModel());
           view.refresh();

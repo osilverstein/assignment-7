@@ -25,6 +25,7 @@ public class MosaicBlur implements Filter {
   int width;
   int height;
   Matrix kernel;
+  int numNodes;
 
   /**
    * Constructor for an mosaic geometric filter.
@@ -34,10 +35,11 @@ public class MosaicBlur implements Filter {
    * @throws IllegalArgumentException if either are even or less than or equal to
    *                                  0
    */
-  public MosaicBlur() throws IllegalArgumentException {
+  public MosaicBlur(int numNodes) throws IllegalArgumentException {
     this.width = 3;
     this.height = 3;
     this.kernel = new Matrix(width, height);
+    this.numNodes = numNodes;
   }
 
   /**
@@ -49,7 +51,7 @@ public class MosaicBlur implements Filter {
    * @return a map of pixel index to a predictable randomized boolean on whether
    *         they are a cluster node.
    */
-  private int[][] generateClusterMap(Pixel[][] pixels, int seed, int numNodes) {
+  private int[][] generateClusterMap(Pixel[][] pixels, int seed) {
     Random rand = new Random(seed);
     int iterationsWithoutNode = 0;
     int averageInterationsWithoutNode = (int) ((pixels.length * pixels[0].length) / (numNodes * 1.2));
@@ -102,7 +104,7 @@ public class MosaicBlur implements Filter {
 
   @Override
   public Pixel evaluateFilter(Pixel[][] pixels, int row, int col) {
-    int[] closestClusterNode = findClosestClusterNode(pixels, generateClusterMap(pixels, 420, 600),
+    int[] closestClusterNode = findClosestClusterNode(pixels, generateClusterMap(pixels, 420),
         row, col);
     return pixels[closestClusterNode[0]][closestClusterNode[1]];
   }

@@ -54,15 +54,15 @@ public class MosaicBlur implements Filter {
   private int[][] generateClusterMap(Pixel[][] pixels, int seed) {
     Random rand = new Random(seed);
     int iterationsWithoutNode = 0;
-    int averageInterationsWithoutNode = (int) ((pixels.length * pixels[0].length) / (numNodes * 1.2));
+    int averageInterationsWithoutNode = (int) ((pixels.length * pixels[0].length) / (numNodes * 1.2)); //1.2 is a magic number; see below
     //each index of clustMap is the same index as a pixel with the value being a 1 or 0 if it is a cluster node
     int[][] clusterMap = new int[pixels.length][pixels[0].length];
     for (int i = 0; i < pixels.length; i++) {
       for (int j = 0; j < pixels[0].length; j++) {
         double probabilityOfNode = iterationsWithoutNode / averageInterationsWithoutNode;
-        if (rand.nextDouble() + 0.9 < probabilityOfNode) {
+        if (rand.nextDouble() + 0.9 < probabilityOfNode) { //TODO: 0.9 magic number to fix logic error; see below
           clusterMap[i][j] = 1;
-          iterationsWithoutNode = 0;
+          iterationsWithoutNode = 0; //here: this maybe shoudn't be set to 0, just decremented
         } else {
           clusterMap[i][j] = 0;
           iterationsWithoutNode++;

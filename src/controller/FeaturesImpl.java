@@ -86,7 +86,7 @@ public class FeaturesImpl implements IMEFeatures {
     if (!type.contains("Mosaic")) {
       copy.filter(filters.get(type.toLowerCase()));
       this.addToStorage("-" + type, copy);
-    } else { //if mosaic
+    } else {
       //type is the type + " " + the size of the mosaic tiles
       String[] split = type.split(" ");
       int size = Integer.parseInt(split[1]);

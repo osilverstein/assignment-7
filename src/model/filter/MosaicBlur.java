@@ -8,6 +8,7 @@ import model.Kernel;
 import model.Matrix;
 import model.pixel.Pixel;
 
+
 /**
  * MosaicBlur is a filter that represents a blur of the mosaic type using a 3 by 3 kernel.
  */
@@ -48,21 +49,26 @@ public class MosaicBlur implements Filter {
    * @return a map of pixel index to a predictable randomized boolean on whether
    *         they are a cluster node.
    */
-  private int[][] generateClusterMap(Pixel[][] pixels, int seed) {
+  private int[][] generateClusterMap(Pixel[][] pixels, int seed, int numNodes) {
     Random rand = new Random(seed);
+    int iterationsWithoutNode = 0;
+    int averageInterationsWithoutNode = (int) ((pixels.length * pixels[0].length) / (numNodes * 1.2));
+    //each index of clustMap is the same index as a pixel with the value being a 1 or 0 if it is a cluster node
     int[][] clusterMap = new int[pixels.length][pixels[0].length];
     for (int i = 0; i < pixels.length; i++) {
       for (int j = 0; j < pixels[0].length; j++) {
-        //if rand.boolean x3 is true, then it is a cluster node
-        if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()) {
+        double probabilityOfNode = iterationsWithoutNode / averageInterationsWithoutNode;
+        if (rand.nextDouble() + 0.9 < probabilityOfNode) {
           clusterMap[i][j] = 1;
-        }
-        else {
+          iterationsWithoutNode = 0;
+        } else {
           clusterMap[i][j] = 0;
+          iterationsWithoutNode++;
         }
       }
     }
     return clusterMap;
+
   }
 
   /**
@@ -96,17 +102,7 @@ public class MosaicBlur implements Filter {
 
   @Override
   public Pixel evaluateFilter(Pixel[][] pixels, int row, int col) {
-    /**
-     * will ultimately return:
-     * pixels[row][col]
-     * 
-     * An image can be ''broken down" into such stained glass pieces, by choosing a
-     * set of points in the image (called nodes). Each pixel in the image is then
-     * paired to the node that is closest to it (by distance). This creates a
-     * cluster of pixels for each node. Then the color of each pixel in the image is
-     * replaced with the average color of its cluster.
-     */
-    int[] closestClusterNode = findClosestClusterNode(pixels, generateClusterMap(pixels, 420),
+    int[] closestClusterNode = findClosestClusterNode(pixels, generateClusterMap(pixels, 420, 600),
         row, col);
     return pixels[closestClusterNode[0]][closestClusterNode[1]];
   }

@@ -4,20 +4,11 @@ package model.filter;
 import java.util.ArrayList;
 import java.util.Random;
 
-import model.Matrix;
 import model.pixel.Pixel;
-
+import model.pixel.RGBPixel;
 
 /**
  * MosaicBlur is a filter that represents a blur of the mosaic type.
- */
-
-/**
- * An image can be "broken down" into stained glass pieces, by choosing a set of
- * points in the image (called seeds). Each pixel in the image is then paired to
- * the seed that is closest to it (by distance). This creates a cluster of
- * pixels for each seed. Then the color of each pixel in the image is replaced
- * with the average color of its cluster.
  */
 
 public class MosaicBlur implements Filter {
@@ -28,7 +19,7 @@ public class MosaicBlur implements Filter {
   /**
    * Constructor for an mosaic geometric filter.
    * 
-   * @param numNodes the number of nodes in the mosaic.
+   * @param numNodes   the number of nodes in the mosaic.
    * @param clusterMap the cluster map.
    * @param nodeCoords the coordinates of the nodes.
    * @throws IllegalArgumentException if either are even or less than or equal to
@@ -49,30 +40,48 @@ public class MosaicBlur implements Filter {
    *         they are a cluster node.
    */
   private int[][] generateClusterMap(Pixel[][] pixels, int seed) {
-    //check if clusterMap has been initialized
+    // check if clusterMap has been initialized
     if (this.clusterMap != null) {
       return this.clusterMap;
     }
     Random rand = new Random(seed);
-    int iterationsWithoutNode = 0;
-    int averageInterationsWithoutNode = (int) ((pixels.length * pixels[0].length) / (numNodes * 1.2)); //1.2 is a magic number; see below
-    //each index of clustMap is the same index as a pixel with the value being a 1 or 0 if it is a cluster node
-    int[][] clusterMap = new int[pixels.length][pixels[0].length];
+    // how many #s of pixels a node should be added (numNodes)
+    int nodeFreq = (pixels.length * pixels[0].length) / numNodes;
+    // how much space (nodeSpace) is between those nodes
+    int nodeSpace = (pixels.length * pixels[0].length) / nodeFreq;
+    // create a cluster map
+    this.clusterMap = new int[pixels.length][pixels[0].length];
+    // create a list of nodes where nodes are placed every nodeFreq pixels randomly
+    // within the range:
+    // nodeSpace + i horizontally
+    // will move to the next row if it goes out of bounds
     for (int i = 0; i < pixels.length; i++) {
       for (int j = 0; j < pixels[0].length; j++) {
-        double probabilityOfNode = iterationsWithoutNode / averageInterationsWithoutNode;
-        if (rand.nextDouble() + 0.9 < probabilityOfNode) { //TODO: 0.9 magic number to fix logic error; see below
-          clusterMap[i][j] = 1;
-          iterationsWithoutNode = 0;
-          nodeCoords.add(new int[] {i, j});
-        } else {
-          clusterMap[i][j] = 0;
-          iterationsWithoutNode++;
+        int pixelCountSoFar = ((i + 1) * pixels[0].length) + j + 1;
+        if (pixelCountSoFar % nodeFreq == 0) {
+          int[] nodeCoord = new int[2];
+          int additionFactor = rand.nextInt(nodeSpace);
+          // move node horizontally along j by addition factor.
+          // if j + additionFactor is out of bounds, move to the next i value and add the
+          // remainder of additionFactor to j
+          if (j + additionFactor < pixels[0].length) {
+            nodeCoord[0] = j + additionFactor;
+            nodeCoord[1] = i;
+          }
+          // if there is a next row and the remainder is smaller than that row
+          else if (i + 1 < pixels.length && j + additionFactor - pixels[0].length < pixels[0].length) {
+            nodeCoord[0] = j + additionFactor - pixels[0].length;
+            nodeCoord[1] = i + 1;
+          } else {
+            nodeCoord[0] = j;
+            nodeCoord[1] = i;
+          }
+          this.nodeCoords.add(nodeCoord);
+          this.clusterMap[nodeCoord[0]][nodeCoord[1]] = 1;
         }
       }
     }
-    this.clusterMap = clusterMap;
-    return clusterMap;
+    return this.clusterMap;
   }
 
   /**
@@ -98,12 +107,41 @@ public class MosaicBlur implements Filter {
     return closestNode;
   }
 
+  /**
+   * Finds the average color of a cluster.
+   * 
+   * @param pixels     the pixels denoted.
+   * @param clusterMap the map of pixel index to a predictable randomized boolean.
+   * @param x          the x coordinate of the pixel.
+   * @param y          the y coordinate of the pixel.
+   * @return the average color of a cluster as a Pixel.
+   */
+  private Pixel findAverageColor(Pixel[][] pixels, int[][] clusterMap, int x, int y) {
+    int[] closestNode = findClosestNode(pixels, clusterMap, x, y);
+    int xCoord = closestNode[0];
+    int yCoord = closestNode[1];
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+    int numPixels = 0;
+    for (int i = xCoord - 1; i <= xCoord + 1; i++) {
+      for (int j = yCoord - 1; j <= yCoord + 1; j++) {
+        if (i >= 0 && i < pixels.length && j >= 0 && j < pixels[0].length) {
+          if (clusterMap[i][j] == 1) {
+            red += pixels[i][j].getColorChannels()[0];
+            green += pixels[i][j].getColorChannels()[1];
+            blue += pixels[i][j].getColorChannels()[2];
+            numPixels++;
+          }
+        }
+      }
+    }
+    return new RGBPixel(red / numPixels, green / numPixels, blue / numPixels, 255);
+  }
+
   @Override
   public Pixel evaluateFilter(Pixel[][] pixels, int row, int col) {
-    int[] closestClusterNode = findClosestNode(pixels, generateClusterMap(pixels, 420),
-        row, col);
-    //returns pixel at a coordinate
-    return pixels[closestClusterNode[0]][closestClusterNode[1]];
+    return findAverageColor(pixels, generateClusterMap(pixels, 42), row, col);
   }
 
 }

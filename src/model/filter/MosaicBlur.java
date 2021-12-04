@@ -2,6 +2,7 @@
 package model.filter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import model.pixel.Pixel;
@@ -15,6 +16,7 @@ public class MosaicBlur implements Filter {
   int numNodes;
   int[][] clusterMap;
   ArrayList<int[]> nodeCoords;
+  HashMap<int[], int[]> pixelToNodeHashMap;
 
   /**
    * Constructor for an mosaic geometric filter.
@@ -28,6 +30,7 @@ public class MosaicBlur implements Filter {
   public MosaicBlur(int numNodes) throws IllegalArgumentException {
     this.numNodes = numNodes;
     this.nodeCoords = new ArrayList<int[]>();
+    this.pixelToNodeHashMap = new HashMap<int[], int[]>();
   }
 
   /**
@@ -94,6 +97,9 @@ public class MosaicBlur implements Filter {
    * @return the closest cluster node to a pixel as an int[].
    */
   private int[] findClosestNode(Pixel[][] pixels, int[][] clusterMap, int x, int y) {
+    if (pixelToNodeHashMap.containsKey(new int[] { x, y })) {
+      return pixelToNodeHashMap.get(new int[] { x, y });
+    }
     int[] closestNode = new int[2];
     int minDistance = Integer.MAX_VALUE;
     for (int i = 0; i < nodeCoords.size(); i++) {
@@ -102,6 +108,7 @@ public class MosaicBlur implements Filter {
       if (distance < minDistance) {
         minDistance = distance;
         closestNode = nodeCoord;
+        this.pixelToNodeHashMap.put(new int[] { x, y }, closestNode);
       }
     }
     return closestNode;

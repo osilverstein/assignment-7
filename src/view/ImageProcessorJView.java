@@ -178,7 +178,7 @@ public class ImageProcessorJView extends JFrame implements ImageProcessorViewGUI
         } else {
           mosaicPanel.setVisible(false);
           //decrease the size of the panel
-          filterPanel.setPreferredSize(new Dimension(filterPanel.getWidth(), filterPanel.getHeight() - 100));
+          filterPanel.setPreferredSize(new Dimension(filterPanel.getWidth(), filterPanel.getHeight() - 70));
         }
 
       }

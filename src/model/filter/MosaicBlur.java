@@ -2,16 +2,14 @@
 package model.filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
-import model.Kernel;
 import model.Matrix;
 import model.pixel.Pixel;
 
 
 /**
- * MosaicBlur is a filter that represents a blur of the mosaic type using a 3 by 3 kernel.
+ * MosaicBlur is a filter that represents a blur of the mosaic type.
  */
 
 /**
@@ -23,9 +21,6 @@ import model.pixel.Pixel;
  */
 
 public class MosaicBlur implements Filter {
-  int width;
-  int height;
-  Matrix kernel;
   int numNodes;
   int[][] clusterMap;
   ArrayList<int[]> nodeCoords;
@@ -33,15 +28,13 @@ public class MosaicBlur implements Filter {
   /**
    * Constructor for an mosaic geometric filter.
    * 
-   * @param width  represents the width of the kernel
-   * @param height represents the height of the kernel
+   * @param numNodes the number of nodes in the mosaic.
+   * @param clusterMap the cluster map.
+   * @param nodeCoords the coordinates of the nodes.
    * @throws IllegalArgumentException if either are even or less than or equal to
    *                                  0
    */
   public MosaicBlur(int numNodes) throws IllegalArgumentException {
-    this.width = 3;
-    this.height = 3;
-    this.kernel = new Matrix(width, height);
     this.numNodes = numNodes;
     this.nodeCoords = new ArrayList<int[]>();
   }

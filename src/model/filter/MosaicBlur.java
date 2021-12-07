@@ -79,8 +79,10 @@ public class MosaicBlur implements Filter {
             nodeCoord[0] = j;
             nodeCoord[1] = i;
           }
+
           this.nodeCoords.add(nodeCoord);
           this.clusterMap[nodeCoord[0]][nodeCoord[1]] = 1;
+
         }
       }
     }

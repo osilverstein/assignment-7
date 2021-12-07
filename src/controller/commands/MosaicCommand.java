@@ -5,9 +5,7 @@ import model.filter.MosaicBlur;
 import utilities.ImageRunTimeStorage;
 
 /**
- * The MosaicCommand is an extension of the AbstractCommand in the Command
- * Design that
- * enables the user to mosaicafy the image using a 5 by 5 kernel.
+ * The MosaicCommand is an extension of the AbstractCommand.
  */
 public class MosaicCommand extends AbstractCommand {
   private int amount;
@@ -31,6 +29,12 @@ public class MosaicCommand extends AbstractCommand {
     this.amount = amount;
 }
 
+
+/** 
+ * This method is used to execute the MosaicCommand.
+ * @param m is the model that is being used to execute the command.
+ * @return String that confirms the command was executed.
+ */
 @Override
 public String use(ImprovedImageProcessorModel m) {
   m.filter(new MosaicBlur(amount));

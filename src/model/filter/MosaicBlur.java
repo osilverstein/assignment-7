@@ -1,4 +1,3 @@
-
 package model.filter;
 
 import java.util.ArrayList;
@@ -54,17 +53,12 @@ public class MosaicBlur implements Filter {
     int nodeSpace = (pixels.length * pixels[0].length) / nodeFreq;
     // create a cluster map
     this.clusterMap = new int[pixels.length][pixels[0].length];
-    // create a list of nodes where nodes are placed every nodeFreq pixels randomly
-    // within the range:
-    // nodeSpace + i horizontally
-    // will move to the next row if it goes out of bounds
     for (int i = 0; i < pixels.length; i++) {
       for (int j = 0; j < pixels[0].length; j++) {
         int pixelCountSoFar = ((i + 1) * pixels[0].length) + j + 1;
         if (pixelCountSoFar % nodeFreq == 0) {
           int[] nodeCoord = new int[2];
           int additionFactor = rand.nextInt(nodeSpace);
-          // move node horizontally along j by addition factor.
           // if j + additionFactor is out of bounds, move to the next i value and add the
           // remainder of additionFactor to j
           if (j + additionFactor < pixels[0].length) {
@@ -79,10 +73,17 @@ public class MosaicBlur implements Filter {
             nodeCoord[0] = j;
             nodeCoord[1] = i;
           }
-
-          this.nodeCoords.add(nodeCoord);
-          this.clusterMap[nodeCoord[0]][nodeCoord[1]] = 1;
-
+          try {
+            this.nodeCoords.add(nodeCoord);
+            this.clusterMap[nodeCoord[0]][nodeCoord[1]] = 1;
+          } catch (ArrayIndexOutOfBoundsException e) {
+            try {
+              this.clusterMap[j][i] = 1;
+              this.nodeCoords.add(new int[] { j, i });
+            } catch (ArrayIndexOutOfBoundsException e2) {
+              System.out.println("Skipping.");
+            }
+          }
         }
       }
     }
@@ -145,9 +146,20 @@ public class MosaicBlur implements Filter {
         }
       }
     }
+    if (numPixels == 0) {
+      numPixels = 1;
+    }
     return new RGBPixel(red / numPixels, green / numPixels, blue / numPixels, 255);
   }
 
+  /**
+   * Applies the mosaic blur filter to a pixel array.
+   * 
+   * @param pixels the pixels denoted.
+   * @param row    the row of the pixel array.
+   * @param col    the column of the pixel array.
+   * @return Pixel the blurred pixel.
+   */
   @Override
   public Pixel evaluateFilter(Pixel[][] pixels, int row, int col) {
     return findAverageColor(pixels, generateClusterMap(pixels, 42), row, col);

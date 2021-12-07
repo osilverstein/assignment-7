@@ -18,9 +18,7 @@ import utilities.ImageRunTimeStorage;
 import utilities.ImageUtil;
 
 /**
- * commands.MosaicCommandTest tests the command that turns an image into a
- * grayscaled image
- * based on the red channel.
+ * Tests the MosaicCommand class.
  */
 public class MosaicCommandTest extends AbstractCommandTest {
 
@@ -81,19 +79,39 @@ public class MosaicCommandTest extends AbstractCommandTest {
     assertEquals(20, colors.size(), 1);
   }
 
+  
+  /** 
+   * Creates Command object and returns it.
+   * @param name name of command.
+   * @param newName name of new command.
+   * @param map map of commands.
+   * @return Command object.
+   */
   @Override
   Command createCommand(String name, String newName, ImageRunTimeStorage map) {
     return new MosaicCommand(1, name, newName, map);
   }
 
+  
+  /** 
+   * Gets the ints in the command.
+   * @param row row of command.
+   * @param col column of command.
+   * @return int[] of command.
+   */
   @Override
   int[] getInts(int row, int col) {
     int r = mCopy.getPixel(row, col).getColorChannels()[0];
     return new int[] { r, r, r };
   }
 
+  
+  /** 
+   * Makes it into a string.
+   * @return String of command.
+   */
   @Override
   String returnString() {
-    return " set to red gray scale. Now called: ";
+    return " mosaicafied. Now called: ";
   }
 }
